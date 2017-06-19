@@ -1,6 +1,6 @@
 <?php
     global $pdo;
-    
+
     $user = 'root';
     $pass = 'root';
     $db = 'fydj';
@@ -11,6 +11,7 @@
          $pdo = new PDO('mysql:host='.$host.';dbname='.$db.';port='.$port, $user, $pass);
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage();
+        exit("DB Connection failed");
     }
 
 ?>

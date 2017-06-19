@@ -1,8 +1,13 @@
 <?php
 
+echo "1";
+
 require_once "../db/dbConnect.php";
 
+include_once "simple_html_dom.php";
+
 header('Content-type: application/json');
+
 
 function getJobsPageURLByCompany($companies){
     global $pdo;
@@ -22,9 +27,11 @@ function getJobsPageURLByCompany($companies){
 
 function getOpenPositionsByURL($jobs_page_url){
     $curl = curl_init();
-    $user_agent = 'Mozilla/5.0 (Windows NT 6.1; rv:8.0) Gecko/20100101 Firefox/8.0';
+    $user_agent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.125 Safari/533.4";
     curl_setopt_array($curl, array(
         CURLOPT_URL => $jobs_page_url, //set request url
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_REFERER => $jobs_page_url,
         CURLOPT_CUSTOMREQUEST  => "GET",        //set request type post or get
         CURLOPT_POST           => false,        //set to GET
         CURLOPT_USERAGENT      => $user_agent, //set user agent
@@ -38,11 +45,16 @@ function getOpenPositionsByURL($jobs_page_url){
         CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
     ));
 
-    $result = curl_exec($curl);
+    $html_str = curl_exec($curl);
     curl_close($curl);
+    
+    // $html = file_get_html($html_str);
+    $html = str_get_html($html_str);
 
-    if ($result){
-        echo "result: $result";
+    foreach($html->find('div.js-sidebar-departments') as $jobs_list){
+        foreach($jobs_list->find('a') as $job){
+            echo $job->src;
+        }
     }
 }
 
